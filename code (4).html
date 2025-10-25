@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xetro Multi-Energy App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #FFFFFF; /* White background */
+            color: #000000; /* Black text */
+        }
+        .header {
+            background-color: #000000; /* Black header */
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .container {
+            padding: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: block;
+        }
+        .button {
+            background-color: #DC3545; /* Red button */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 100%;
+        }
+        .button:hover {
+            background-color: #C82333; /* Darker red on hover */
+        }
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #000000; /* Black tab bar */
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
+        .tab {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            text-align: center;
+        }
+        .tab.active {
+            font-weight: bold;
+        }
+        .list-item {
+            background-color: #F8F9FA; /* Light gray for cards */
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #E9ECEF; /* Light gray */
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #DC3545; /* Red progress */
+            width: 0%;
+            transition: width 0.5s;
+        }
+        .reward-card {
+            background-color: #F8F9FA; /* Light gray */
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">Xetro Multi-Energy App</div>
+    <div class="container">
+        <!-- Home Screen -->
+        <div id="home" class="screen active">
+            <h2>Welcome to Xetro 2.0</h2>
+            <p>Powering India's clean tomorrow with EV charging, hydrogen, E20 fuel, and rewards.</p>
+            <button class="button" onclick="showScreen('stations')">Find Stations</button>
+            <button class="button" onclick="showScreen('charging')">Start EV Charging</button>
+            <button class="button" onclick="showScreen('rewards')">View Rewards</button>
+            <div class="reward-card">
+                <strong>Green Points Balance:</strong> <span id="points">150</span> pts
+            </div>
+        </div>
+
+        <!-- Stations Screen -->
+        <div id="stations" class="screen">
+            <h2>Find Xetro Stations</h2>
+            <div class="list-item">
+                <strong>Gujarat Hub</strong><br>
+                EV Charging: Yes | Hydrogen: Yes | E20 Fuel: Yes | Non-Fuel: Café & Mart
+            </div>
+            <div class="list-item">
+                <strong>Tamil Nadu Hub</strong><br>
+                EV Charging: Yes | Hydrogen: Pilot | E20 Fuel: Yes | Non-Fuel: EV Services
+            </div>
+            <div class="list-item">
+                <strong>Mumbai Hub</strong><br>
+                EV Charging: Yes | Hydrogen: No | E20 Fuel: Yes | Non-Fuel: Retail Store
+            </div>
+            <button class="button" onclick="earnPoints(10)">Earn 10 Green Points for Visiting</button>
+        </div>
+
+        <!-- Charging Screen -->
+        <div id="charging" class="screen">
+            <h2>EV Charging Station</h2>
+            <p>Select charger type and start session.</p>
+            <select id="chargerType">
+                <option>Fast Charger (50kW)</option>
+                <option>Standard Charger (22kW)</option>
+            </select>
+            <button class="button" onclick="startCharging()">Start Charging</button>
+            <div id="chargingStatus" style="display: none;">
+                <p>Charging in progress...</p>
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+                <p id="chargePercent">0% Complete</p>
+                <button class="button" onclick="stopCharging()">Stop Charging</button>
+            </div>
+        </div>
+
+        <!-- Rewards Screen -->
+        <div id="rewards" class="screen">
+            <h2>Your Rewards</h2>
+            <div class="reward-card">
+                <strong>Total Green Points:</strong> <span id="totalPoints">150</span>
+            </div>
+            <p>Redeem for discounts on fuel, EV charges, or non-fuel items.</p>
+            <button class="button" onclick="redeemPoints(50)">Redeem 50 Points for ₹50 Discount</button>
+            <p>Earn points by charging EVs, using E20 fuel, or visiting hubs!</p>
+        </div>
+
+        <!-- Profile Screen -->
+        <div id="profile" class="screen">
+            <h2>User Profile</h2>
+            <p>Name: John Doe</p>
+            <p>Email: john@xetro.com</p>
+            <p>Preferred Hub: Gujarat</p>
+            <button class="button" onclick="earnPoints(20)">Update Profile (Earn 20 Points)</button>
+        </div>
+    </div>
+
+    <!-- Bottom Tab Bar -->
+    <div class="tab-bar">
+        <a href="#" class="tab active" onclick="showScreen('home')">Home</a>
+        <a href="#" class="tab" onclick="showScreen('stations')">Stations</a>
+        <a href="#" class="tab" onclick="showScreen('charging')">Charge</a>
+        <a href="#" class="tab" onclick="showScreen('rewards')">Rewards</a>
+        <a href="#" class="tab" onclick="showScreen('profile')">Profile</a>
+    </div>
+
+    <script>
+        let points = 150;
+        let chargingInterval;
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function earnPoints(amount) {
+            points += amount;
+            updatePoints();
+            alert(`Earned ${amount} Green Points!`);
+        }
+
+        function redeemPoints(amount) {
+            if (points >= amount) {
+                points -= amount;
+                updatePoints();
+                alert(`Redeemed ${amount} points for discount!`);
+            } else {
+                alert('Not enough points!');
+            }
+        }
+
+        function updatePoints() {
+            document.getElementById('points').textContent = points;
+            document.getElementById('totalPoints').textContent = points;
+        }
+
+        function startCharging() {
+            document.getElementById('chargingStatus').style.display = 'block';
+            let progress = 0;
+            chargingInterval = setInterval(() => {
+                progress += 10;
+                document.getElementById('progressFill').style.width = progress + '%';
+                document.getElementById('chargePercent').textContent = progress + '% Complete';
+                if (progress >= 100) {
+                    clearInterval(chargingInterval);
+                    alert('Charging complete! Earned 25 Green Points.');
+                    earnPoints(25);
+                }
+            }, 1000);
+        }
+
+        function stopCharging() {
+            clearInterval(chargingInterval);
+            document.getElementById('chargingStatus').style.display = 'none';
+            alert('Charging stopped.');
+        }
+    </script>
+</body>
+</html>
